@@ -44,31 +44,31 @@ class SCurve(DataHandler):
           pds_tam_2050 (float): total addressible market in 2050.
         """
         result = pd.DataFrame(dtype=np.float64)
-        for year in range(base_year, dd.CORE_END_YEAR + 1):
-            # the First Half function from Building Automation Systems "S Curve"!AH24:
-            # =(((1-AH$18)/(1+EXP(-((LN(1/AH$18-1)-LN(1/AH$21-1))/(AH$20-AH$17))
-            #     *($AG24-(LN(1/AH$18-1)/((LN(1/AH$18-1)-LN(1/AH$21-1))/(AH$20-AH$17))+AH$17))))
-            #     *'Unit Adoption Calculations'!B$105)+AH$21*AH$18*'Unit Adoption Calculations'!B$105)
-            #  *
-            # ((($AG$60-$AG$24)-($AG$60-$AG24))/($AG$60-$AG$24))
-            #  +
-            # ((($AG$60-$AG24)/($AG$60-base_year))*AH$19)
-            # where:
-            #   $AG24 = year
-            #   AH$17 = $AG$24 = 2014 = base_year
-            #   AH$18 = base_percent
-            #   AH$19 = base_adoption
-            #   AH$20 = $AG$60 = 2050 = last_year
-            #   AH$21 = last_percent
-            #   'Unit Adoption Calculations'!B$105 = pds_tam_2050
+        # the First Half function from Building Automation Systems "S Curve"!AH24:
+        # =(((1-AH$18)/(1+EXP(-((LN(1/AH$18-1)-LN(1/AH$21-1))/(AH$20-AH$17))
+        #     *($AG24-(LN(1/AH$18-1)/((LN(1/AH$18-1)-LN(1/AH$21-1))/(AH$20-AH$17))+AH$17))))
+        #     *'Unit Adoption Calculations'!B$105)+AH$21*AH$18*'Unit Adoption Calculations'!B$105)
+        #  *
+        # ((($AG$60-$AG$24)-($AG$60-$AG24))/($AG$60-$AG$24))
+        #  +
+        # ((($AG$60-$AG24)/($AG$60-base_year))*AH$19)
+        # where:
+        #   $AG24 = year
+        #   AH$17 = $AG$24 = 2014 = base_year
+        #   AH$18 = base_percent
+        #   AH$19 = base_adoption
+        #   AH$20 = $AG$60 = 2050 = last_year
+        #   AH$21 = last_percent
+        #   'Unit Adoption Calculations'!B$105 = pds_tam_2050
 
-            #
-            # In Excel models last_percent is set to 0.999999999999999 to mean 100% adoption
-            # (which Excel helpfully displays as 100%).
-            # LN(1/AH$21-1) = LN(1/1-1) = LN(0) (which doesn't exist), so being asymptotically
-            # close to 100% ends up being approximately LN(0.0000000000000009) instead of LN(0).
-            # We pull in the value which Excel comes up with, -34.65735902799730.
-            magic = -34.65735902799730
+        #
+        # In Excel models last_percent is set to 0.999999999999999 to mean 100% adoption
+        # (which Excel helpfully displays as 100%).
+        # LN(1/AH$21-1) = LN(1/1-1) = LN(0) (which doesn't exist), so being asymptotically
+        # close to 100% ends up being approximately LN(0.0000000000000009) instead of LN(0).
+        # We pull in the value which Excel comes up with, -34.65735902799730.
+        magic = -34.65735902799730
+        for year in range(base_year, dd.CORE_END_YEAR + 1):
             np_err_settings = np.seterr(divide='raise')
             try:
                 # lcot == log change over time

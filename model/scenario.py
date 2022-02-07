@@ -144,7 +144,10 @@ class Scenario:
     # Key Results
 
     def key_results(self, year=2050, region='World'):
-        if self.solution_category == self.solution_category.REDUCTION or self.solution_category == self.solution_category.REPLACEMENT:
+        if self.solution_category in [
+            self.solution_category.REDUCTION,
+            self.solution_category.REPLACEMENT,
+        ]:
             return {'implementation_unit_adoption_increase': self.implementation_unit_adoption_increase(year=year),
                     'functional_unit_adoption_increase': self.functional_unit_adoption_increase(year=year),
                     'marginal_first_cost': self.marginal_first_cost(year=year),
@@ -188,7 +191,6 @@ class Scenario:
 
         return (pds_adoption.loc[year][region]  - 
             ref_adoption.loc[year][region])
-        pass
 
     def total_additional_co2eq_sequestered(self, year=2050):
         # farmlandrestoration starts in year 2021 in Advanced Control excel
@@ -263,7 +265,7 @@ class RRSScenario(Scenario):
 
         ref_data_sources = self._ref_tam_sources
         pds_data_sources = self._pds_tam_sources
-        
+
         # Handle the inline override case by completely overriding the relevant fields
         if self.ac.ref_tam_custom_source:
             #  Create a custom source structure for an inline source
@@ -284,11 +286,14 @@ class RRSScenario(Scenario):
             tamconfig.loc['source_after_2014','PDS World'] = pdsworld
         if self.ac.pds_tam_custom_source:
             name = 'Inline Tam'
-            pds_data_sources = { 'Custom Cases' : { 
-                    name : self.ac.pds_tam_custom_source,
-                    name + 'dup' : self.ac.pds_tam_custom_source,
-                    'include': True
-                }}
+            pds_data_sources = {
+                'Custom Cases': {
+                    name: self.ac.pds_tam_custom_source,
+                    f'{name}dup': self.ac.pds_tam_custom_source,
+                    'include': True,
+                }
+            }
+
             tamconfig.loc['source_after_2014','PDS World'] = 'Custom Cases'
 
         self.tm = tam.TAM(
@@ -329,7 +334,7 @@ def load_sources(jsonfile, fieldname='filename'):
                     f = Path(struct[k])
                     if not f.is_absolute():
                         struct[k] = str(rootdir / f)
-                elif isinstance(struct[k],dict) or isinstance(struct[k], list):
+                elif isinstance(struct[k], (dict, list)):
                     rootstruct(struct[k], rootdir, fieldname)
 
     jsonfile = Path(jsonfile).resolve()
@@ -348,6 +353,6 @@ def deroot(struct, fieldname):
                 f = Path(result[k])
                 if f.is_file():
                     result[k] = str(f.name)
-            elif isinstance(struct[k], dict) or isinstance(struct[k], list):
+            elif isinstance(struct[k], (dict, list)):
                 result[k] = deroot(result[k], fieldname)
     return result

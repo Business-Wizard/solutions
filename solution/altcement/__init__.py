@@ -163,7 +163,7 @@ class Scenario(scenario.RRSScenario):
         def demangle(name):
             # Pandas tries to be helpful by mangling duplicate column names, so the first
             # read_excel returns 'Latin America' and the second 'Latin America.1'
-            if not '.' in name:
+            if '.' not in name:
                 return name
             new, suffix = name.rsplit('.', 1)
             return new if isint(suffix) else name

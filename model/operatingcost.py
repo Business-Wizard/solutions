@@ -228,8 +228,10 @@ class OperatingCost(DataHandler):
            Fixed and Variable costs that are constant or changing over time are included.
            SolarPVUtil 'Operating Cost'!B262:AV386
         """
-        if (self.ac.solution_category == SOLUTION_CATEGORY.LAND or
-                self.ac.solution_category == SOLUTION_CATEGORY.OCEAN):
+        if self.ac.solution_category in [
+            SOLUTION_CATEGORY.LAND,
+            SOLUTION_CATEGORY.OCEAN,
+        ]:
             new_land_units_per_year = self.soln_pds_new_funits_per_year().loc[:, 'World']
             new_funits_per_year = new_land_units_per_year
             new_annual_iunits_reqd = new_land_units_per_year
@@ -274,8 +276,10 @@ class OperatingCost(DataHandler):
            Fixed and Variable costs that are constant or changing over time are included.
            SolarPVUtil 'Operating Cost'!B399:AV523
         """
-        if (self.ac.solution_category == SOLUTION_CATEGORY.LAND or
-                self.ac.solution_category == SOLUTION_CATEGORY.OCEAN):
+        if self.ac.solution_category in [
+            SOLUTION_CATEGORY.LAND,
+            SOLUTION_CATEGORY.OCEAN,
+        ]:
             new_land_units_per_year = self.soln_pds_new_funits_per_year().loc[:, 'World']
             new_funits_per_year = new_land_units_per_year
             new_annual_iunits_reqd = new_land_units_per_year

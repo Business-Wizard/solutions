@@ -152,7 +152,14 @@ def test_report():
     data_sources = []
     for i in range(1, 3):
         name = f'af_ca{i}'
-        data_sources.append({'name': name, 'filename': datadir.joinpath(name + '.csv'), 'include': True})
+        data_sources.append(
+            {
+                'name': name,
+                'filename': datadir.joinpath(f'{name}.csv'),
+                'include': True,
+            }
+        )
+
     lims = pd.read_csv(datadir.joinpath('af_tla.csv'), index_col=0)
     ca = customadoption.CustomAdoption(data_sources=data_sources, soln_adoption_custom_name='',
                                        total_adoption_limit=lims)

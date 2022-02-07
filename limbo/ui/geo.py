@@ -113,7 +113,7 @@ def get_globe(topofile, df, size=None, key=None):
                 x_t.extend(x1 + [0])
                 y_t.extend(y1 + [0])
                 z_t.extend(z1 + [0])
-                for _ in range(0, len(x1)):
+                for _ in range(len(x1)):
                     tri_t.append([0, offset, offset+1])
                     offset += 1
                 offset += 1

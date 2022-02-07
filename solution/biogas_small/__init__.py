@@ -154,15 +154,6 @@ class Scenario(scenario.RRSScenario):
         self.initialize_adoption_bases()
         ref_adoption_data_per_region = self.ref_ca.adoption_data_per_region()
 
-        if False:
-            # One may wonder why this is here. This file was code generated.
-            # This 'if False' allows subsequent conditions to all be elif.
-            pass
-        elif self.ac.soln_pds_adoption_basis == 'Existing Adoption Prognostications':
-            pds_adoption_data_per_region = self.ad.adoption_data_per_region()
-            pds_adoption_trend_per_region = self.ad.adoption_trend_per_region()
-            pds_adoption_is_single_source = self.ad.adoption_is_single_source()
-
         ht_ref_adoption_initial = pd.Series(
             [86.0, 0.0, 0.0, 25.04194984517459, 5.337266131329677,
              36.925127117549664, 0.0, 0.0, 0.0, 0.0],

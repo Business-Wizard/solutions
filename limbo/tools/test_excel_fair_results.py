@@ -47,7 +47,7 @@ def test_animation_file(tmpdir):
         assert "Electricity" in contents
         assert "2020" in contents
 
-    for opt in range(1, 4):
+    for _ in range(1, 4):
         # Drawdown Book (2017) results
         outfile = tmpdir.join(f"excel_fair_results_test_Temperature_OPT{pds}.csv")
         assert outfile.size() > 1024

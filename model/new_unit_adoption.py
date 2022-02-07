@@ -157,8 +157,7 @@ class NewUnitAdoption:
         result = self.annual_breakout(end_year)
         result *= self.operating_cost
 
-        cost_series = result.sum(axis='columns')
-        return cost_series
+        return result.sum(axis='columns')
 
 
     def get_incremental_units_per_period(self) -> pd.Series:
@@ -176,10 +175,10 @@ class NewUnitAdoption:
         how_fast = 2 # If double enter 2, if every 4 x increase, then enter 4
         param_b = math.log10(learning_rate) / math.log10(how_fast)
 
-        # For some solutions (e.g. seaweed farming), param_b == zero. So following will produce a static series of self.first_cost.
-        cost_series = self.implementation_units.loc[:].apply(lambda x: x**param_b) * self.first_cost
-
-        return cost_series
+        return (
+            self.implementation_units.loc[:].apply(lambda x: x ** param_b)
+            * self.first_cost
+        )
 
 
     def get_annual_world_first_cost(self) -> pd.Series:
@@ -189,20 +188,16 @@ class NewUnitAdoption:
 
         #TODO - validate input params.
 
-        i_units = self.get_incremental_units_per_period()        
-        result = i_units * self._first_cost
-
-        return result
+        i_units = self.get_incremental_units_per_period()
+        return i_units * self._first_cost
 
 
     def get_lifetime_operating_savings(self, end_year) -> pd.Series:
 
         # After muliplying by (1 + disturbance_rate) this should match the time series in [Operating Cost]!$C$125
-        
+
         matrix = self.annual_breakout(end_year)
-        cost_series = matrix.sum(axis='columns') * self.operating_cost
-        
-        return cost_series
+        return matrix.sum(axis='columns') * self.operating_cost
 
 
     def get_lifetime_cashflow_npv(self, purchase_year, discount_rate) -> pd.Series:
@@ -219,14 +214,14 @@ class NewUnitAdoption:
         first_val = first_val * discount_factor**(years_old_at_start)
 
         results = [first_val]
-        
+
         for row in range(self.expected_lifetime-1):
             to_append = self.operating_cost * discount_factor**(years_old_at_start + row+1)
             results.append(to_append)
 
-        result = pd.Series(results,index=first_cost_series[:self.expected_lifetime].index)
-        
-        return result
+        return pd.Series(
+            results, index=first_cost_series[: self.expected_lifetime].index
+        )
 
 
     def get_net_profit_margin(self, end_year):
@@ -269,7 +264,7 @@ class NewUnitAdoption:
         return
     
     def apply_clip(self, lower = None, upper = None) -> None:
-        if lower == None and upper == None:
+        if lower is None and upper is None:
             print('Warning : Neither lower nor upper parameter supplied. No action taken.')
         self._area_units.clip(lower=lower, upper=upper, inplace=True)
 
@@ -288,13 +283,9 @@ class NewUnitAdoption:
         # [Unit Adoption Calculations]!$CH$135 (for solution adoption)
         # [Unit Adoption Calculations]!$CH$197 (for reference adoption)
 
-        if delay_impact_of_protection_by_one_year:
-            delay = 1
-        else:
-            delay = 0
-        
+        delay = 1 if delay_impact_of_protection_by_one_year else 0
         results = pd.Series(index = self._area_units.index, dtype=float)
-        
+
         first_pass = True
         for year, area_units_total_area in self._area_units.loc[self.base_year - 1:].iteritems():
             if first_pass:
@@ -302,7 +293,7 @@ class NewUnitAdoption:
                 area_degraded_previous_year = 0.0 # prev_value = Area Degraded in Previous Year
                 first_pass = False
                 continue
-            
+
             # units_adopted = protected area
             units_adopted = self.implementation_units.loc[year-delay]
 
@@ -312,7 +303,7 @@ class NewUnitAdoption:
 
             results.loc[year] = result
             area_degraded_previous_year = result
-        
+
         return results
 
     def get_total_at_risk_area(self, growth_rate_of_ocean_degradation: np.float64, 
@@ -356,13 +347,9 @@ class NewUnitAdoption:
         # [Unit Adoption Calculations]!$EJ$135 (for PDS adoption)
         # [Unit Adoption Calculations]!$EJ$197 (for reference adoption)
 
-        if delay_impact_of_protection_by_one_year:
-            delay = 1
-        else:
-            delay = 0
-        
+        delay = 1 if delay_impact_of_protection_by_one_year else 0
         results = pd.Series(index = self._area_units.index, dtype=float)
-        
+
         first_pass = True
         for year, _ in self.implementation_units.loc[self.base_year:].iteritems():
             if first_pass:
@@ -377,10 +364,8 @@ class NewUnitAdoption:
             result = min(result, protected_area)
             results.loc[year] = result
             area_degraded_previous_year = result
-        
-        series = pd.Series(results, index=self.implementation_units.index)
 
-        return series
+        return pd.Series(results, index=self.implementation_units.index)
 
 
     def get_total_undegraded_area(self, growth_rate_of_ocean_degradation,
@@ -446,9 +431,11 @@ class NewUnitAdoption:
                                 delay_impact_of_protection_by_one_year
                                 )
 
-        cumulative_degraded_area = cumulative_degraded_unprotected_area + cumulative_degraded_area_under_protection + total_undegraded_area.shift(1)
-
-        return cumulative_degraded_area
+        return (
+            cumulative_degraded_unprotected_area
+            + cumulative_degraded_area_under_protection
+            + total_undegraded_area.shift(1)
+        )
         
 
     def get_total_emissions_reduction(self, disturbance_rate, growth_rate_of_ocean_degradation, delay_impact_of_protection_by_one_year, emissions_reduced_per_unit_area, use_aggregate_CO2_equivalent_instead_of_individual_GHG: bool) -> pd.Series:
@@ -463,10 +450,8 @@ class NewUnitAdoption:
             area = self.get_total_undegraded_area(growth_rate_of_ocean_degradation, disturbance_rate, delay_impact_of_protection_by_one_year)
         else:
             area = self.get_cumulative_degraded_unprotected_area(delay_impact_of_protection_by_one_year, growth_rate_of_ocean_degradation)
-            
-        result = area * emissions_reduced_per_unit_area
-        
-        return result
+
+        return area * emissions_reduced_per_unit_area
         
 
     def get_carbon_sequestration(self, sequestration_rate, disturbance_rate, growth_rate_of_ocean_degradation,
@@ -521,7 +506,7 @@ class NewUnitAdoption:
                 delay_impact_of_protection_by_one_year,
                 delay_regrowth_of_degraded_land_by_one_year,
                 use_adoption_for_carbon_sequestration_calculation)
-        
+
         # following this function call, total_emissions_reduction should correspond to 'CO2-eq MMT Reduced', [CO2 Calcs]!$B$64.
         total_emissions_reduction = self.get_total_emissions_reduction(disturbance_rate, growth_rate_of_ocean_degradation, delay_impact_of_protection_by_one_year, emissions_reduced_per_unit_area, use_aggregate_CO2_equivalent_instead_of_individual_GHG)
 
@@ -535,13 +520,10 @@ class NewUnitAdoption:
 
         for iter_year in result_years:
             year_results = []
-            exponent= 0
-
-            for _ in range(iter_year, result_years[-1] +1):
+            for exponent, _ in enumerate(range(iter_year, result_years[-1] +1), start=1):
                 year_net_adoption = reduction_plus_sequestration.loc[iter_year]
-                exponent += 1
-                val =  0.217 + 0.259*np.exp(-(exponent)/172.9) 
-                val += 0.338*np.exp(-(exponent)/18.51) 
+                val =  0.217 + 0.259*np.exp(-(exponent)/172.9)
+                val += 0.338*np.exp(-(exponent)/18.51)
                 val += 0.186*np.exp(-(exponent)/1.186)
                 year_results.append(year_net_adoption * val)
 

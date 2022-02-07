@@ -12,14 +12,14 @@ def get_model_overview_svg(model, highlights=None, width=None, prefix=None):
     for s in model.scenarios.values():
         if s.soln_pds_adoption_basis == 'Existing Adoption Prognostications':
             has_default_pds_ad = True
-        if s.soln_pds_adoption_basis == 'Fully Customized PDS':
+        elif s.soln_pds_adoption_basis == 'Fully Customized PDS':
             has_custom_pds_ad = True
         if 'S-Curve' in s.soln_pds_adoption_basis:
             has_s_curve_pds_ad = True
-        if s.soln_ref_adoption_basis == 'Default':
-            has_default_ref_ad = True
         if s.soln_ref_adoption_basis == 'Custom':
             has_custom_ref_ad = True
+        elif s.soln_ref_adoption_basis == 'Default':
+            has_default_ref_ad = True
         if s.solution_category == advanced_controls.SOLUTION_CATEGORY.LAND:
             is_land = True
         if s.solution_category == advanced_controls.SOLUTION_CATEGORY.OCEAN:
@@ -110,7 +110,7 @@ def randomize_ids(tree, prefix):
     for elem in tree.getroot().iter():
         if 'id' in elem.attrib:
             orig = elem.attrib['id']
-            elem.attrib['id'] = prefix + '_' + orig
+            elem.attrib['id'] = f'{prefix}_{orig}'
         for tag in ['filter', 'marker-end', 'marker-start']:
             if tag not in elem.attrib:
                 continue

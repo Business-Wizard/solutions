@@ -93,7 +93,7 @@ class TAM(DataHandler, object, metaclass=MetaclassCache):
         """Read data files in self.tam_*_data_sources to populate forecast data."""
         df_per_region = {}
         main_region = dd.REGIONS[0]
-        main_region_pds = 'PDS ' + main_region
+        main_region_pds = f'PDS {main_region}'
         for region in dd.REGIONS + [main_region_pds]:
             df = pd.DataFrame()
             df.name = 'forecast_data_' + self._name_to_identifier(region)
@@ -181,43 +181,51 @@ class TAM(DataHandler, object, metaclass=MetaclassCache):
             return result
 
         region_key = None if region is None else f'Region: {region}'
-        columns = interpolation.matching_data_sources(data_sources=data_sources,
-                name=tamconfig['source_until_2014'], groups_only=False, region_key=region_key)
-        if columns and len(columns) > 1:
-            # In Excel, the Mean computation is:
-            # SUM($C521:$Q521)/COUNTIF($C521:$Q521,">0")
-            #
-            # The intent is to skip sources which are empty, but also means that
-            # a source where the real data is 0.0 will not impact the Medium result.
-            #
-            # See this document for more information:
-            # https://docs.google.com/document/d/19sq88J_PXY-y_EnqbSJDl0v9CdJArOdFLatNNUFhjEA/edit#heading=h.yvwwsbvutw2j
-            #
-            # We're matching the Excel behavior in the initial product. This decision can
-            # be revisited later, when matching results from Excel is no longer required.
-            # To revert, use:    m = forecast.loc[:2014, columns].mean(axis=1)
-            # and:               m = forecast.loc[2015:, columns].mean(axis=1)
-            forecast_filtered = forecast.loc[:2014, columns]
-            m = forecast_filtered.mask(forecast_filtered == 0.0, np.nan).mean(axis=1)
-            m.name = 'Medium'
-            result.update(m)
-        elif columns and len(columns) == 1:
-            m = forecast.loc[:2014, columns].mean(axis=1)
-            m.name = 'Medium'
-            result.update(m)
+        if columns := interpolation.matching_data_sources(
+            data_sources=data_sources,
+            name=tamconfig['source_until_2014'],
+            groups_only=False,
+            region_key=region_key,
+        ):
+            if len(columns) > 1:
+                # In Excel, the Mean computation is:
+                # SUM($C521:$Q521)/COUNTIF($C521:$Q521,">0")
+                #
+                # The intent is to skip sources which are empty, but also means that
+                # a source where the real data is 0.0 will not impact the Medium result.
+                #
+                # See this document for more information:
+                # https://docs.google.com/document/d/19sq88J_PXY-y_EnqbSJDl0v9CdJArOdFLatNNUFhjEA/edit#heading=h.yvwwsbvutw2j
+                #
+                # We're matching the Excel behavior in the initial product. This decision can
+                # be revisited later, when matching results from Excel is no longer required.
+                # To revert, use:    m = forecast.loc[:2014, columns].mean(axis=1)
+                # and:               m = forecast.loc[2015:, columns].mean(axis=1)
+                forecast_filtered = forecast.loc[:2014, columns]
+                m = forecast_filtered.mask(forecast_filtered == 0.0, np.nan).mean(axis=1)
+                m.name = 'Medium'
+                result.update(m)
+            elif len(columns) == 1:
+                m = forecast.loc[:2014, columns].mean(axis=1)
+                m.name = 'Medium'
+                result.update(m)
 
-        columns = interpolation.matching_data_sources(data_sources=data_sources,
-                name=tamconfig['source_after_2014'], groups_only=False, region_key=region_key)
-        if columns and len(columns) > 1:
-            # see comment above about Mean and this lambda function
-            forecast_filtered = forecast.loc[2015:, columns]
-            m = forecast_filtered.mask(forecast_filtered == 0.0, np.nan).mean(axis=1)
-            m.name = 'Medium'
-            result.update(m)
-        elif columns and len(columns) == 1:
-            m = forecast.loc[2015:, columns].mean(axis=1)
-            m.name = 'Medium'
-            result.update(m)
+        if columns := interpolation.matching_data_sources(
+            data_sources=data_sources,
+            name=tamconfig['source_after_2014'],
+            groups_only=False,
+            region_key=region_key,
+        ):
+            if len(columns) > 1:
+                # see comment above about Mean and this lambda function
+                forecast_filtered = forecast.loc[2015:, columns]
+                m = forecast_filtered.mask(forecast_filtered == 0.0, np.nan).mean(axis=1)
+                m.name = 'Medium'
+                result.update(m)
+            elif len(columns) == 1:
+                m = forecast.loc[2015:, columns].mean(axis=1)
+                m.name = 'Medium'
+                result.update(m)
 
         low_sd_mult = tamconfig['low_sd_mult']
         high_sd_mult = tamconfig['high_sd_mult']
@@ -249,7 +257,7 @@ class TAM(DataHandler, object, metaclass=MetaclassCache):
 
 
     def _get_data_sources(self, data_sources, region):
-        key = "Region: " + region
+        key = f'Region: {region}'
         return data_sources.get(key, data_sources)
 
 
@@ -493,7 +501,7 @@ class TAM(DataHandler, object, metaclass=MetaclassCache):
         result = pd.DataFrame(columns=dd.REGIONS)
         for idx, region in enumerate(result.columns):
             if idx == 0:
-                region_pds = 'PDS ' + region
+                region_pds = f'PDS {region}'
                 result[region] = self.forecast_trend(region_pds).loc[:, 'adoption']
                 lmh = self.forecast_low_med_high(region)
                 growth = self.tamconfig.loc['growth', region_pds]

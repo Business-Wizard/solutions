@@ -67,7 +67,7 @@ def get_tla_per_regime():
 
 def get_total_world_area():
     """ All land area considered for DD solutions (Mha) """
-    return sum([x.sum() for x in get_tla_per_regime().values()])
+    return sum(x.sum() for x in get_tla_per_regime().values())
 
 
 def full_survey(land_solutions_scenarios, outfile):
@@ -185,8 +185,7 @@ def avg_abatement_cost(soln):
     seq = soln.c2.co2_sequestered_global().loc[2020:2050, 'All'].sum()
     red = soln.c2.co2eq_mmt_reduced().loc[2020:2050, 'World'].sum()
     abatement = (seq + red) / 1000
-    abatement_cost = -npv / (abatement * 1e9)
-    return abatement_cost
+    return -npv / (abatement * 1e9)
 
 
 if __name__ == '__main__':

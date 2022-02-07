@@ -12,16 +12,17 @@ def recursive_get_package_data():
   matches = []
   THIS_FILE_DIR = os.path.dirname(os.path.realpath(__file__))
   for ext in EXTENSIONS:
-      for root, dirnames, filenames in os.walk(THIS_FILE_DIR):
-          for filename in fnmatch.filter(filenames, ext):
-              matches.append(os.path.join(os.path.relpath(root, THIS_FILE_DIR), 
-                                          filename))
-          for dirname in dirnames:
-              for root, dirnames, filenames in os.walk(dirname):
-                for filename in fnmatch.filter(filenames, ext):
-                  matches.append(os.path.join(
-                    os.path.relpath(root, os.path.join(THIS_FILE_DIR, dirname)), filename))
-
+    for root, dirnames, filenames in os.walk(THIS_FILE_DIR):
+      matches.extend(
+          os.path.join(os.path.relpath(root, THIS_FILE_DIR), filename)
+          for filename in fnmatch.filter(filenames, ext))
+      for dirname in dirnames:
+        for root, dirnames, filenames in os.walk(dirname):
+          matches.extend(
+              os.path.join(
+                  os.path.relpath(root, os.path.join(THIS_FILE_DIR, dirname)),
+                  filename,
+              ) for filename in fnmatch.filter(filenames, ext))
   return matches
 
 def list_package_dependencies():

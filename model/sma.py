@@ -142,13 +142,18 @@ class SMA:
         # Do the 2nd and 3rd substitions first
         sources = {}
         for region in self.region_cases.keys():
-            cases = {}
-            for case in self.region_cases[region].keys():
-                cases[case] = { self.sources[sn].title : directory/self.sources[sn].filename for sn in self.region_cases[region][case] }
+            cases = {
+                case: {
+                    self.sources[sn].title: directory / self.sources[sn].filename
+                    for sn in self.region_cases[region][case]
+                }
+                for case in self.region_cases[region].keys()
+            }
+
             if region in dd.REGIONS[1:]:
-                region = "Region: " + region
+                region = f'Region: {region}'
             sources[region] = cases
-        
+
         # Do the 1st substitution: disinter the first region.  
         # To keep the dictionary ordering correct, we actually copy stuff over again.
         firstregion = list(self.region_cases.keys())[0]

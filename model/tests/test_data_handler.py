@@ -24,8 +24,8 @@ def test_ch4_tons_reduced():
     existing_key = 'ch4_tons_reduced' in json_data
 
     pd.testing.assert_frame_equal(result.loc[2015:], expected, check_exact=False)
-    assert is_data_handler == True
-    assert existing_key == True
+    assert is_data_handler
+    assert existing_key
     pd.testing.assert_frame_equal(json_data['ch4_tons_reduced'].loc[2015:], expected, check_exact=False)
 
 # 'Unit Adoption'!B251:L298

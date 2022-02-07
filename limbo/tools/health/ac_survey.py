@@ -11,10 +11,7 @@ import solution.factory
 
 def survey(outfile):
     a = ac.AdvancedControls()
-    columns = []
-    for field in dataclasses.fields(a):
-        columns.append(field.name)
-
+    columns = [field.name for field in dataclasses.fields(a)]
     results = pd.DataFrame(columns=columns, dtype='int')
     results.index.name = 'Solution'
     all_solutions_scenarios = solution.factory.all_solutions_scenarios()

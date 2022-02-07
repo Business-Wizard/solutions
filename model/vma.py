@@ -42,10 +42,7 @@ def check_fixed_summary(*values):
     Returns:
         None if any value is NaN/None, otherwise a tuple of the given iterable
     """
-    if any([pd.isna(value) for value in values]):
-        return None
-    else:
-        return tuple(values)
+    return None if any(pd.isna(value) for value in values) else tuple(values)
 
 
 def convert_percentages(val):
@@ -118,7 +115,7 @@ class VMA:
             # Instantiate VMA with various file types
             if isinstance(filename, io.StringIO) or filename.suffix == '.csv':
                 self._read_csv(filename=filename)
-            elif filename.suffix == '.xlsx' or filename.suffix == '.xlsm':
+            elif filename.suffix in ['.xlsx', '.xlsm']:
                 self._read_xls(filename=filename, title=title)
             else:
                 raise ValueError(
@@ -300,7 +297,7 @@ class VMA:
             return mean, high, low
         elif key == 'high':
             return high
-        elif key == 'mean' or key == 'average' or key == 'avg':
+        elif key in ['mean', 'average', 'avg']:
             return mean
         elif key == 'low':
             return low

@@ -46,14 +46,13 @@ def map_ne_admin_to_drawdown_regions(row):
 
     if dd_name in SPECIAL_COUNTRIES:
         return [dd_name]
+    dd_region = admin_names.region_mapping.get(dd_name)
+    if dd_region is None:
+        return None
+    elif isinstance(dd_region, list):
+        return dd_region
     else:
-        dd_region = admin_names.region_mapping.get(dd_name)
-        if dd_region is None:
-            return None
-        elif isinstance(dd_region, list):
-            return dd_region
-        else:
-            raise ValueError(f"List expected, but got {dd_region}")
+        raise ValueError(f"List expected, but got {dd_region}")
 
 
 def map_ne_admin_counties_to_drawdown_regions(shapefile_zip_path):

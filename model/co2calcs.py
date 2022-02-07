@@ -39,12 +39,13 @@ class NumpyEncoder(json.JSONEncoder):
 def fair_scm_cached(json_input: str):
     input = json.loads(json_input)
     values = np.array(input['values'])
-    kwargs = {}
-    for k in input['kwargs']:
-        if isinstance(input['kwargs'][k], list):
-            kwargs[k] = np.array(input['kwargs'][k])
-        else:
-            kwargs[k] = input['kwargs'][k]
+    kwargs = {
+        k: np.array(input['kwargs'][k])
+        if isinstance(input['kwargs'][k], list)
+        else input['kwargs'][k]
+        for k in input['kwargs']
+    }
+
     return fair.forward.fair_scm(emissions=values, useMultigas=input['useMultigas'], **kwargs)
 
 def fair_scm(values, useMultigas, **kwargs):
@@ -233,8 +234,10 @@ class CO2Calcs(DataHandler):
         """
         s = self.ac.report_start_year
         e = self.ac.report_end_year
-        if (self.ac.solution_category != model.advanced_controls.SOLUTION_CATEGORY.LAND and
-                self.ac.solution_category != model.advanced_controls.SOLUTION_CATEGORY.OCEAN):
+        if self.ac.solution_category not in [
+            model.advanced_controls.SOLUTION_CATEGORY.LAND,
+            model.advanced_controls.SOLUTION_CATEGORY.OCEAN,
+        ]:
             # RRS
             co2eq_reduced_grid_emissions = self.co2eq_reduced_grid_emissions()
             m = pd.DataFrame(0.0, columns=co2eq_reduced_grid_emissions.columns.copy(),
@@ -290,8 +293,10 @@ class CO2Calcs(DataHandler):
         """
         s = self.ac.report_start_year
         e = self.ac.report_end_year
-        if (self.ac.solution_category != model.advanced_controls.SOLUTION_CATEGORY.LAND and
-                self.ac.solution_category != model.advanced_controls.SOLUTION_CATEGORY.OCEAN):
+        if self.ac.solution_category not in [
+            model.advanced_controls.SOLUTION_CATEGORY.LAND,
+            model.advanced_controls.SOLUTION_CATEGORY.OCEAN,
+        ]:
             # RRS
             co2eq_reduced_grid_emissions = self.co2eq_reduced_grid_emissions()
             m = pd.DataFrame(0.0, columns=co2eq_reduced_grid_emissions.columns.copy(),
@@ -422,8 +427,10 @@ class CO2Calcs(DataHandler):
         else:
             co2_vals = self.co2_mmt_reduced()['World']
 
-        if (self.ac.solution_category == model.advanced_controls.SOLUTION_CATEGORY.LAND or
-                self.ac.solution_category == model.advanced_controls.SOLUTION_CATEGORY.OCEAN):
+        if self.ac.solution_category in [
+            model.advanced_controls.SOLUTION_CATEGORY.LAND,
+            model.advanced_controls.SOLUTION_CATEGORY.OCEAN,
+        ]:
             co2_vals = self.co2_sequestered_global()['All'] + self.co2eq_mmt_reduced()['World']
             assert self.ac.emissions_use_co2eq, 'Land/ocean models must use CO2 eq'
 

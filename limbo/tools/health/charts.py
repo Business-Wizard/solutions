@@ -22,6 +22,5 @@ def soln_comparison(df, title=None):
     x_axis = Axis(scale=x_scale, grid_lines='none', orientation='vertical')
     bars = Bars(x=df.index.values, y=df[val_name].values,
                 scales={'x': x_scale, 'y': y_scale}, orientation='horizontal')
-    fig = Figure(marks=[bars], axes=[x_axis, y_axis], padding_y=0, title=title,
+    return Figure(marks=[bars], axes=[x_axis, y_axis], padding_y=0, title=title,
                  fig_margin={'top': 60, 'bottom': 60, 'left': 200, 'right': 60})
-    return fig
