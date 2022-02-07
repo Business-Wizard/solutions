@@ -163,13 +163,13 @@ def trend_algorithm(data, trend):
     """Fit of data via one of several trend interpolation algorithms."""
     t = trend.lower()
     if t == "linear": return linear_trend(data=data)
-    if t == "2nd poly" or t == "2nd_poly" or t == "degree2":
+    if t in ["2nd poly", "2nd_poly", "degree2"]:
         return poly_degree2_trend(data=data)
-    if t == "3rd poly" or t == "3rd_poly" or t == "degree3":
+    if t in ["3rd poly", "3rd_poly", "degree3"]:
         return poly_degree3_trend(data=data)
-    if t == "exponential" or t == "exp":
+    if t in ["exponential", "exp"]:
         return exponential_trend(data=data)
-    if t == "single" or t == "single source":
+    if t in ["single", "single source"]:
         return single_trend(data)
     raise ValueError('invalid trend algorithm: ' + str(trend))
 

@@ -27,7 +27,7 @@ class CO2Equiv:
        SAR: as used in the IPCC Second Assessment Report.
     """
     def __init__(self, conversion_source=None):
-        self.conversion_source = conversion_source if conversion_source else CO2EQ_SOURCE.AR5_WITH_FEEDBACK
+        self.conversion_source = conversion_source or CO2EQ_SOURCE.AR5_WITH_FEEDBACK
         if self.conversion_source == CO2EQ_SOURCE.AR5_WITH_FEEDBACK:
             self.CH4multiplier = 34
             self.N2Omultiplier = 298

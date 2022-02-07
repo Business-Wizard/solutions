@@ -58,7 +58,7 @@ def solnname(s):
 
 
 def fullname(s):
-    return s.name + ':' + s.scenario
+    return f'{s.name}:{s.scenario}'
 
 
 def vma_qgrid_modified(event, qgrid_widget):
@@ -199,13 +199,12 @@ class JupyterUI:
            Arguments:
             data: a dict() containing a Vega description.
         """
-        if self.is_jupyterlab:
-            out = ipywidgets.Output()
-            with out:
-                IPython.display.display({'application/vnd.vega.v4+json': data}, raw=True)
-            return out
-        else:
+        if not self.is_jupyterlab:
             return self.vega_widget.VegaWidget(data)
+        out = ipywidgets.Output()
+        with out:
+            IPython.display.display({'application/vnd.vega.v4+json': data}, raw=True)
+        return out
 
 
     def _get_sector_for_solution(self, module_name):
@@ -245,8 +244,10 @@ class JupyterUI:
                 align_items="stretch", width="100%")
         white_row = '<div style="font-size:medium; background-color:white;padding-left:2px;">'
         grey_row = '<div style="font-size:medium; background-color:#ececec;padding-left:2px;">'
-        hdr_row = '<div style="font-size:large;background-color:white;'
-        hdr_row += 'padding-left:2px;font-weight:bold;">'
+        hdr_row = (
+            '<div style="font-size:large;background-color:white;'
+            + 'padding-left:2px;font-weight:bold;">'
+        )
 
         children = [ipywidgets.HBox([
             ipywidgets.HTML(f'{hdr_row}Solution</div>', layout=soln_layout),
@@ -264,7 +265,7 @@ class JupyterUI:
             c2eq = ipywidgets.HTML(f'{style}{row.CO2eq:.02f}</div>', layout=c2eq_layout)
             if row.DirName:
                 cbox = ipywidgets.Checkbox(value=False, layout=cbox_layout)
-                cbox.add_class('checkbox_' + row.DirName)  # used as a selector for UI tests
+                cbox.add_class(f'checkbox_{row.DirName}')
                 cbox.d = {'uiobj': self, 'name': 'checkbox:' + row.DirName}
                 cbox.observe(checkbox_observe, names='value')
                 checkboxes[row.DirName] = cbox
@@ -308,10 +309,9 @@ class JupyterUI:
                 pds_vs_ref = (s.ua.soln_pds_tot_iunits_reqd().loc[2050, 'World'] -
                         s.ua.soln_ref_tot_iunits_reqd().loc[2050, 'World'])
                 iunits = f"{pds_vs_ref:.2f} {ilabel}"
-                funits = f"{s.ua.soln_net_annual_funits_adopted().loc[2050, 'World']:.2f} {flabel}"
             else:
                 iunits = ''
-                funits = f"{s.ua.soln_net_annual_funits_adopted().loc[2050, 'World']:.2f} {flabel}"
+            funits = f"{s.ua.soln_net_annual_funits_adopted().loc[2050, 'World']:.2f} {flabel}"
             unit_adoption_text.append([fullname(s), iunits, funits])
 
         unit_adoption_columns = ['Scenario', 'Implementation Adoption Increase in 2050 (PDS vs REF)',

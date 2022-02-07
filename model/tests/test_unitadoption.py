@@ -291,7 +291,7 @@ def test_soln_pds_cumulative_funits_bug_behavior():
          [2017, 944.21, 153.0, 3.66, 45.14, 6.16, 32.30, 32.94, 8.50, 113.54, 29.24]]
     expected = pd.DataFrame(v[1:], columns=v[0]).set_index('Year')
     expected.name = "soln_pds_cumulative_funits"
-    pd.testing.assert_frame_equal(result.iloc[0:5], expected, check_exact=False)
+    pd.testing.assert_frame_equal(result.iloc[:5], expected, check_exact=False)
 
     ua = unitadoption.UnitAdoption(ac=None,
             ref_total_adoption_units=None, pds_total_adoption_units=None,
@@ -306,7 +306,7 @@ def test_soln_pds_cumulative_funits_bug_behavior():
          [2017, 944.21, 78.0, 3.33, 24.07, 4.58, 17.65, 17.97, 5.75, 58.27, 16.12]]
     expected = pd.DataFrame(v[1:], columns=v[0]).set_index('Year')
     expected.name = "soln_pds_cumulative_funits"
-    pd.testing.assert_frame_equal(result.iloc[0:5], expected, check_exact=False)
+    pd.testing.assert_frame_equal(result.iloc[:5], expected, check_exact=False)
 
 
 def test_soln_pds_cumulative_funits_bug_behavior_ref_base_adoption():
@@ -376,7 +376,7 @@ def test_soln_pds_cumulative_funits_missing_data():
          [2017, 944.21, 151.00, 1.66, 42.14, 3.16, 29.30, 29.94, 5.50, 110.54, 26.24]]
     expected = pd.DataFrame(v[1:], columns=v[0]).set_index('Year')
     expected.name = "soln_pds_cumulative_funits"
-    pd.testing.assert_frame_equal(result.iloc[0:5], expected, check_exact=False)
+    pd.testing.assert_frame_equal(result.iloc[:5], expected, check_exact=False)
 
 
 def test_soln_ref_cumulative_funits():
@@ -400,8 +400,9 @@ def test_soln_ref_cumulative_funits():
          [2017, 477.16, 303.75, 1.36, 90.81, 7.11, 63.20, 62.65, 12.92, 224.01, 53.05]]
     expected = pd.DataFrame(v[1:], columns=v[0]).set_index('Year')
     expected.name = "soln_ref_cumulative_funits"
-    pd.testing.assert_frame_equal(result.iloc[0:5], expected, check_exact=False,
-            check_less_precise=2)
+    pd.testing.assert_frame_equal(
+        result.iloc[:5], expected, check_exact=False, check_less_precise=2
+    )
 
 
 def test_soln_ref_cumulative_funits_with_NaN():
@@ -426,8 +427,9 @@ def test_soln_ref_cumulative_funits_with_NaN():
          [2017, 477.16, 303.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]
     expected = pd.DataFrame(v[1:], columns=v[0]).set_index('Year')
     expected.name = "soln_ref_cumulative_funits"
-    pd.testing.assert_frame_equal(result.iloc[0:5], expected, check_exact=False,
-            check_less_precise=2)
+    pd.testing.assert_frame_equal(
+        result.iloc[:5], expected, check_exact=False, check_less_precise=2
+    )
 
 
 def test_soln_net_annual_funits_adopted():

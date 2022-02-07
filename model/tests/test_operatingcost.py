@@ -44,7 +44,7 @@ def _defaultOperatingCost(npv_discount_rate=0.094, single_iunit_purchase_year=20
             soln_var_oper_cost_per_funit=0.0, soln_fuel_cost_per_funit=0.0,
             soln_fixed_oper_cost_per_iunit=23.18791293579,
             npv_discount_rate=npv_discount_rate)
-    oc = operatingcost.OperatingCost(ac=ac,
+    return operatingcost.OperatingCost(ac=ac,
             soln_net_annual_funits_adopted=soln_net_annual_funits_adopted,
             soln_pds_tot_iunits_reqd=soln_pds_tot_iunits_reqd,
             soln_ref_tot_iunits_reqd=soln_ref_tot_iunits_reqd,
@@ -56,7 +56,6 @@ def _defaultOperatingCost(npv_discount_rate=0.094, single_iunit_purchase_year=20
             soln_pds_install_cost_per_iunit=soln_pds_install_cost_per_iunit,
             conv_ref_install_cost_per_iunit=conv_ref_install_cost_per_iunit,
             conversion_factor=10 ** 9)
-    return oc
 
 
 def test_soln_pds_annual_breakout():
@@ -129,7 +128,7 @@ def test_soln_pds_cumulative_operating_cost():
 
 def test_conv_ref_annual_operating_cost():
     oc = _defaultOperatingCost()
-    result = oc.conv_ref_annual_operating_cost().iloc[0:46]
+    result = oc.conv_ref_annual_operating_cost().iloc[:46]
     expected = pd.Series(conv_ref_annual_operating_cost_nparray[:, 1],
             index=conv_ref_annual_operating_cost_nparray[:, 0], dtype=np.float64)
     expected.name = 'conv_ref_annual_operating_cost'

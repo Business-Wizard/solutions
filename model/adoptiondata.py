@@ -80,7 +80,7 @@ class AdoptionData(DataHandler, object, metaclass=MetaclassCache):
         """Read data files in self.tam_*_data_sources to populate forecast data."""
         df_per_region = {}
         main_region = dd.REGIONS[0]
-        main_region_pds = 'PDS ' + main_region
+        main_region_pds = f'PDS {main_region}'
         for region in dd.REGIONS + [main_region_pds]:
             df = pd.DataFrame()
             df.name = 'forecast_data_' + self._name_to_identifier(region)
@@ -115,14 +115,9 @@ class AdoptionData(DataHandler, object, metaclass=MetaclassCache):
             # Excel STDDEV.P is a whole population stddev, ddof=0
             result.loc[:, 'S.D'] = adoption_data.loc[:, columns].std(axis=1, ddof=0)
         else:
-            # The need to do a quirks adjustment here means we have to hack is_group_name:
-            is_group = self.quirky_is_group_name(data_sources=data_sources, name=source)
-            
-            # Excel treats single named columns differently from groups containing only a single column.
-            # For a single named column, the SD is taken over all sources.  For a group, it is taken over
-            # the group, even though there is only a single member, yielding 0
-            # #EXCEL-BAD-BEHAVIOR
-            if is_group:
+            if is_group := self.quirky_is_group_name(
+                data_sources=data_sources, name=source
+            ):
                 result.loc[:,'S.D'] = 0.0
             else:
                 result.loc[:, 'S.D'] = adoption_data.std(axis=1, ddof=0)
@@ -181,15 +176,16 @@ class AdoptionData(DataHandler, object, metaclass=MetaclassCache):
     def _adoption_trend(self, low_med_high, growth, trend):
         """Adoption prediction via one of several interpolation algorithms."""
         if growth is None or trend is None:
-            result = pd.DataFrame(np.nan, index=low_med_high.index.copy(), columns=['adoption'])
-        else:
-            data = low_med_high[growth]
-            result = interpolation.trend_algorithm(data=data, trend=trend)
-        return result
+            return pd.DataFrame(
+                np.nan, index=low_med_high.index.copy(), columns=['adoption']
+            )
+
+        data = low_med_high[growth]
+        return interpolation.trend_algorithm(data=data, trend=trend)
 
 
     def _get_data_sources(self, region):
-        key = "Region: " + region
+        key = f'Region: {region}'
         return self.data_sources.get(key, self.data_sources)
 
 

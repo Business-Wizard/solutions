@@ -193,12 +193,18 @@ def test_matching_data_sources():
     assert itrp.matching_data_sources(data_sources=g_data_sources,
                                       name='100% REN', groups_only=False) == []
     assert itrp.matching_data_sources(data_sources=g_data_sources,
-                                      name=None, groups_only=False) == None
+                                      name=None, groups_only=False) is None
 
 
 def test_matching_data_sources_no_such_group():
-    assert itrp.matching_data_sources(data_sources=g_data_sources,
-                                      name='no such group', groups_only=False) == None
+    assert (
+        itrp.matching_data_sources(
+            data_sources=g_data_sources,
+            name='no such group',
+            groups_only=False,
+        )
+        is None
+    )
 
 
 def test_matching_data_sources_regional():

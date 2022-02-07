@@ -427,9 +427,11 @@ class UnitAdoption(DataHandler):
                 # replacement_period_offset is a backwards compatibility thing
                 replacement_year = year - (self.ac.soln_lifetime_replacement_rounded + self.replacement_period_offset)
                 fa = self.soln_pds_funits_adopted
-                if replacement_year in result.index:
-                    if fa.loc[replacement_year, region] <= fa.loc[year, region]:
-                        result.at[year, region] += result.at[replacement_year, region]
+                if (
+                    replacement_year in result.index
+                    and fa.loc[replacement_year, region] <= fa.loc[year, region]
+                ):
+                    result.at[year, region] += result.at[replacement_year, region]
         result.name = "soln_pds_new_iunits_reqd"
         return result
 
@@ -479,7 +481,7 @@ class UnitAdoption(DataHandler):
         """
         if self.repeated_cost_for_iunits:
             return self.soln_ref_tot_iunits_reqd().iloc[1:].copy(deep=True).clip(lower=0.0)
-        
+
         # start with year-over-year diff
         result = self.soln_ref_tot_iunits_reqd().diff().clip(lower=0).iloc[1:]  # [0] NaN w/ diff
 
@@ -493,9 +495,11 @@ class UnitAdoption(DataHandler):
                 replacement_year = year - (self.ac.soln_lifetime_replacement_rounded + self.replacement_period_offset)
                 fa = self.soln_ref_funits_adopted
 
-                if replacement_year in result.index:
-                    if fa.loc[replacement_year, region] <= fa.loc[year, region]:
-                        result.at[year, region] += result.at[replacement_year, region]
+                if (
+                    replacement_year in result.index
+                    and fa.loc[replacement_year, region] <= fa.loc[year, region]
+                ):
+                    result.at[year, region] += result.at[replacement_year, region]
         return result
 
 
@@ -525,8 +529,10 @@ class UnitAdoption(DataHandler):
 
            This table is also used to Calculate Marginal First Cost and NPV.
         """
-        if (self.ac.solution_category == SOLUTION_CATEGORY.LAND or
-                self.ac.solution_category == SOLUTION_CATEGORY.OCEAN):
+        if self.ac.solution_category in [
+            SOLUTION_CATEGORY.LAND,
+            SOLUTION_CATEGORY.OCEAN,
+        ]:
             result = self.soln_ref_new_iunits_reqd_LAND()
         else:
             result = self.soln_ref_new_iunits_reqd_RRS()
@@ -580,8 +586,10 @@ class UnitAdoption(DataHandler):
         SolarPVUtil 'Unit Adoption Calculations'!Q251:AA298
         """
 
-        if (self.ac.solution_category == SOLUTION_CATEGORY.LAND or
-                self.ac.solution_category == SOLUTION_CATEGORY.OCEAN):
+        if self.ac.solution_category in [
+            SOLUTION_CATEGORY.LAND,
+            SOLUTION_CATEGORY.OCEAN,
+        ]:
             result = self.total_area_per_region - self.soln_ref_funits_adopted.fillna(0.0)
         else:  # RRS
             result = ((self.ref_tam_per_region - self.soln_ref_funits_adopted.fillna(0.0)) /

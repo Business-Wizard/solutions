@@ -39,12 +39,8 @@ def load_scenario(solution, scenario=None):
 @lru_cache()
 def _load_module(solution):
     """Return the Scenario class and list of scenarios."""
-    importname = 'solution.' + solution
-    m = importlib.import_module(importname)
-    return m
+    importname = f'solution.{solution}'
+    return importlib.import_module(importname)
 
 def all_solutions_scenarios():
-    everything = {}
-    for solution in all_solutions():
-        everything[solution] = list_scenarios(solution)
-    return everything
+    return {solution: list_scenarios(solution) for solution in all_solutions()}

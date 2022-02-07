@@ -219,7 +219,7 @@ class CustomAdoption(object, metaclass=MetaclassCache):
         # https://docs.google.com/document/d/19sq88J_PXY-y_EnqbSJDl0v9CdJArOdFLatNNUFhjEA/edit#heading=h.u0yuiva79mg1
         final = initial.copy()
         linear = initial.copy()
-        for y in range(2015, 2051):
+        for _ in range(2015, 2051):
             final = final * (1 + rate)
         linear.loc[2050] = final.iloc[0]
 
@@ -328,7 +328,7 @@ class CustomAdoption(object, metaclass=MetaclassCache):
                 limits_diff = (1.01 * adoption_limits - df).fillna(0)
                 amount_exceeded = -limits_diff[limits_diff < 0]
                 report_data[name]['amount exceeded'] = amount_exceeded
-                report_summary.loc[name, 'Exceeds limits'] = True if amount_exceeded.any().any() else False
+                report_summary.loc[name, 'Exceeds limits'] = bool(amount_exceeded.any().any())
 
             # check ratio of the sum of the main regions to world region (should be ~1)
             if has_regional_data:

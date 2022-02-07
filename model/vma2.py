@@ -21,10 +21,7 @@ def check_fixed_summary(*values):
     Returns:
         None if any value is NaN/None, otherwise a tuple of the given iterable
     """
-    if any([pd.isna(value) for value in values]):
-        return None
-    else:
-        return tuple(values)
+    return None if any(pd.isna(value) for value in values) else tuple(values)
 
 
 def convert_percentages(val):
@@ -110,7 +107,7 @@ class VMA:
         self._validate_readable_df(readable_df)
         self.source_data = readable_df
         if self.use_weight:
-            err = f"'Use weight' selected but no weights to use"
+            err = "'Use weight' selected but no weights to use"
             assert not all(pd.isnull(readable_df['Weight'])), err
         self.df['Weight'] = readable_df['Weight'].apply(convert_percentages)
         self.df['Raw'] = readable_df['Raw Data Input'].apply(convert_percentages)
@@ -210,7 +207,7 @@ class VMA:
             return mean, high, low
         elif key == 'high':
             return high
-        elif key == 'mean' or key == 'average' or key == 'avg':
+        elif key in ['mean', 'average', 'avg']:
             return mean
         elif key == 'low':
             return low

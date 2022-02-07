@@ -51,14 +51,11 @@ def convert_sr_float(tab, row=None, col=None):
 
        Accepts either (tab, row, col) arguments or a single (value) argument
     """
-    if row is not None:
-        val = xls(tab, row, col)
-    else:
-        val = tab
-    
-    m = re.match(r'Val:\(([-+]?(\d+(\.\d*)?|\d+(\,\d*)?|\.\d+)([eE][-+]?\d+)?)\) Formula:=',
-                 str(val))
-    if m:
+    val = xls(tab, row, col) if row is not None else tab
+    if m := re.match(
+        r'Val:\(([-+]?(\d+(\.\d*)?|\d+(\,\d*)?|\.\d+)([eE][-+]?\d+)?)\) Formula:=',
+        str(val),
+    ):
         s = str(m.group(1)).replace(',', '.')
         return float(s)
     if str(val).startswith('Val:() Formula:='):

@@ -11,10 +11,13 @@ def solution_treemap(solutions, width, height):
          solutions: Pandas DataFrame with columns 'Solution', 'Sector', and 'CO2eq'
          width, height: in pixels
     """
-    elements = {'root': {'id': 1}}
-    elements['row1'] = {'id': 2, 'parent': 1}
-    elements['row2'] = {'id': 3, 'parent': 1}
-    elements['row3'] = {'id': 4, 'parent': 1}
+    elements = {
+        'root': {'id': 1},
+        'row1': {'id': 2, 'parent': 1},
+        'row2': {'id': 3, 'parent': 1},
+        'row3': {'id': 4, 'parent': 1},
+    }
+
     idx = 5
     for name in ['Transport', 'Oceans', 'Materials']:
         elements[name] = {'id': idx, 'name': name, 'parent': 2,

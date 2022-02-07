@@ -213,11 +213,10 @@ class HelperTables:
         fract_years = (years - year1) / (year2 - year1)
         fract_adopt = fract_years * (adopt2 - adopt1)
 
-        adoption = pd.DataFrame(fract_adopt + adopt1,
+        return pd.DataFrame(fract_adopt + adopt1,
                                 columns=datapoints.columns, 
                                 index=years.squeeze(), 
                                 dtype="float")
-        return adoption
 
     @lru_cache()
     def soln_pds_funits_adopted(self, suppress_override=False):

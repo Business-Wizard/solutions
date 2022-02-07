@@ -794,8 +794,9 @@ class AdvancedControls:
             g = self.soln_pds_adoption_prognostication_growth
             raise ValueError("invalid adoption prognostication growth name=" + str(g))
 
-        intersect = set(self.ref_adoption_use_pds_years) & set(self.pds_adoption_use_ref_years)
-        if intersect:
+        if intersect := set(self.ref_adoption_use_pds_years) & set(
+            self.pds_adoption_use_ref_years
+        ):
             err = ("cannot be in both ref_adoption_use_pds_years and pds_adoption_use_ref_years:"
                     + str(intersect))
             raise ValueError(err)
@@ -925,7 +926,7 @@ class AdvancedControls:
             raw_val_from_excel = val['value']
             stat = val['statistic']
             if not stat:
-                return val['value']
+                return raw_val_from_excel
         else:
             return val
 
@@ -950,7 +951,7 @@ class AdvancedControls:
         return result
 
     def _hash_item(self, item):
-        if isinstance(item, pd.DataFrame) or isinstance(item, pd.Series):
+        if isinstance(item, (pd.DataFrame, pd.Series)):
             item = tuple(pd.util.hash_pandas_object(item))
         try:
             return hash(item)
@@ -963,9 +964,9 @@ class AdvancedControls:
 
     def __hash__(self):
         key = 0x811c9dc5
-        key = key ^ id(self)
+        key ^= id(self)
         for field in dataclasses.fields(self):
-            key = key ^ self._hash_item(field)
+            key ^= self._hash_item(field)
         return key
 
     def write_to_json_file(self, newname=None):
@@ -991,12 +992,11 @@ def fill_missing_regions_from_world(data):
 
     Returns: the processed Series object or passes through float
     """
-    if isinstance(data, pd.Series):
-        filled_data = data.copy(deep=True)
-        filled_data.loc[MAIN_REGIONS] = filled_data[MAIN_REGIONS].fillna(data['World'])
-        return filled_data
-    else:
+    if not isinstance(data, pd.Series):
         return data
+    filled_data = data.copy(deep=True)
+    filled_data.loc[MAIN_REGIONS] = filled_data[MAIN_REGIONS].fillna(data['World'])
+    return filled_data
 
 
 def load_scenarios_from_json(directory, vmas):
@@ -1018,10 +1018,14 @@ def ac_from_dict(data: dict, vmas, filename="") -> AdvancedControls:
 
 
 def get_vma_for_param(param):
-    for field in dataclasses.fields(AdvancedControls):
-        if field.name == param:
-            return field.metadata.get('vma_titles', [])
-    return []
+    return next(
+        (
+            field.metadata.get('vma_titles', [])
+            for field in dataclasses.fields(AdvancedControls)
+            if field.name == param
+        ),
+        [],
+    )
 
 def get_param_for_vma_name(name):
     for field in dataclasses.fields(AdvancedControls):

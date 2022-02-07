@@ -119,9 +119,8 @@ def make_vma_df_template():
     input to the VMA python class. A researcher can thus use this function to create
     a new VMA table in python to populate with data if they want.
     """
-    df = pd.read_csv(CSV_TEMPLATE_PATH, index_col=False, skipinitialspace=True,
+    return pd.read_csv(CSV_TEMPLATE_PATH, index_col=False, skipinitialspace=True,
             skip_blank_lines=True, comment='#', dtype="object")
-    return df
 
 
 def df_approx(df1, df2):
@@ -158,10 +157,14 @@ class VMAReader:
         if self._data_csvs is None:
             self._data_csvs = self._read_data_csvs()
 
-        for filename, data_df in self._data_csvs.items():
-            if df_approx(df, data_df):
-                return filename
-        return None
+        return next(
+            (
+                filename
+                for filename, data_df in self._data_csvs.items()
+                if df_approx(df, data_df)
+            ),
+            None,
+        )
 
     def xls_df_dict(self, alt_vma=False, title=None):
         """
@@ -188,13 +191,8 @@ class VMAReader:
         # The 'Variable Meta-analysis' sheet is empty for this solution
         # I changed the sheet to 'Variable Meta-analysis-Open instead
         # DMK 12.08.21
-        if alt_vma:
-            sheetname = 'Variable Meta-analysis-Open'
-            fixed_summary = True
-        else:
-            sheetname = 'Variable Meta-analysis-Open'
-            fixed_summary = False
-
+        fixed_summary = bool(alt_vma)
+        sheetname = 'Variable Meta-analysis-Open'
         # Extract VMA table locations
         self._find_tables(sheetname=sheetname)
 
@@ -247,8 +245,7 @@ class VMAReader:
         info_df = pd.DataFrame(columns=['Title on xls', 'Fixed Mean', 'Fixed High', 'Fixed Low'])
         info_df.index.name = 'VMA number'
 
-        i = 1
-        for title, (table_df, use_weight, (average, high, low)) in df_dict.items():
+        for i, (title, (table_df, use_weight, (average, high, low))) in enumerate(df_dict.items(), start=1):
             path_friendly_title = ''
             if table_df is not None:
                 existing = self.find_data_csv(table_df)
@@ -261,10 +258,13 @@ class VMAReader:
                     # use it. Reference the common file in all of those solutions.
                     path_friendly_title = existing
 
-            row = {'Filename': path_friendly_title,
-                   'Title on xls': title,
-                   'Has data?': False if table_df is None else True,
-                   'Use weight?': use_weight}
+            row = {
+                'Filename': path_friendly_title,
+                'Title on xls': title,
+                'Has data?': table_df is not None,
+                'Use weight?': use_weight,
+            }
+
             vma_df.loc[i, :] = row
 
             if not pd.isna(average) or not pd.isna(high) or not pd.isna(low):
@@ -273,9 +273,6 @@ class VMAReader:
                        'Fixed High': high,
                        'Fixed Low': low}
                 info_df.loc[i, :] = row
-
-            # Bookkeep to track our position in vma_df, info_df
-            i += 1
 
         if csv_path is not None:
             info_df.to_csv(os.path.join(csv_path, 'VMA_info.csv'))

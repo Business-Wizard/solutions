@@ -18,7 +18,7 @@ class MetaclassCache(type):
     cache = {}
 
     def hash_item(self, item):
-        if isinstance(item, pd.DataFrame) or isinstance(item, pd.Series):
+        if isinstance(item, (pd.DataFrame, pd.Series)):
             item = tuple(pd.util.hash_pandas_object(item))
         try:
             return hash(item)

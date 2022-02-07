@@ -53,7 +53,7 @@ class OceanTam():
         
     
     def apply_clip(self, lower = None, upper = None):
-        if lower == None and upper == None:
+        if lower is None and upper is None:
             print('Warning : Neither lower nor upper parameter supplied. No action taken.')
         self._tam.clip(lower=lower, upper=upper, inplace=True)
 

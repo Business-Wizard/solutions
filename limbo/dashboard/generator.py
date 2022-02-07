@@ -30,10 +30,12 @@ def _get_summary_charts(all_solutions, py_solutions):
     custom_pds_data_basis_counts = get_custom_pds_data_basis_counts()
     scenarios_per_solution = get_scenarios_per_solution(py_solutions)
 
-    charts = {}
-    charts["solution_implementation"] = make_pie_chart(
-        excel_python_count, "type", "count", "Solution Implementation"
-    )
+    charts = {
+        'solution_implementation': make_pie_chart(
+            excel_python_count, "type", "count", "Solution Implementation"
+        )
+    }
+
     charts["pds_adoption_basis"] = make_pie_chart(
         pds_adoption_basis_counts, "type", "count", "PDS Adoption Basis"
     )
@@ -73,24 +75,26 @@ def _get_regional_charts(survey_data):
             bins=20,
         )
 
-    charts[f"pds_adoption_r_squared"] = make_hist_chart(
+    charts['pds_adoption_r_squared'] = make_hist_chart(
         survey_data["Rvalue"].dropna() ** 2,
-        f"Linearity of PDS Adoption",
+        'Linearity of PDS Adoption',
         "R squared value",
         "number of scenarios",
         bins=30,
     )
+
     return charts
 
 
 def _get_land_solution_analytics(land_survey):
-    charts = {}
-    for col, title in [
-        ("% tla", "% of land allocation reached"),
-        ("% world alloc", "% of World land allocated to solution"),
-        ("avg abatement cost", "Average abatement cost ($/tCO2)"),
-    ]:
-        charts[col] = make_comparison_chart(land_survey[col], col, "Solution", title)
+    charts = {
+        col: make_comparison_chart(land_survey[col], col, "Solution", title)
+        for col, title in [
+            ("% tla", "% of land allocation reached"),
+            ("% world alloc", "% of World land allocated to solution"),
+            ("avg abatement cost", "Average abatement cost ($/tCO2)"),
+        ]
+    }
 
     has_regions = (
         land_survey["has regional data"]
@@ -141,14 +145,14 @@ def _get_scenarios_analytics(scenarios):
         scenarios_count[scenarios_count.solutions == 0.0].index, inplace=True
     )
 
-    charts = {}
-    charts["scenarios_comparison"] = make_comparison_chart(
-        scenarios_count["solutions"],
-        "solutions",
-        "index",
-        "Parameters which differ between scenarios within solution",
-    )
-    return charts
+    return {
+        'scenarios_comparison': make_comparison_chart(
+            scenarios_count["solutions"],
+            "solutions",
+            "index",
+            "Parameters which differ between scenarios within solution",
+        )
+    }
 
 
 def get_all_charts():
@@ -191,11 +195,10 @@ def generate_html():
 
     cdn = CDN.render()
 
-    html = template.render(
+    return template.render(
         cdn=cdn,
         summary=summary,
         regional=regional,
         land_survey=land_survey,
         scenarios=scenarios,
     )
-    return html

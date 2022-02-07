@@ -108,12 +108,11 @@ class OceanSolution(Solution):
     def get_global_percent_adoption_base_year(self) -> np.float64:
         # Adoption for base year, as a percentage of TOA.
         pds_series = self.pds_scenario.get_units_adopted()
-        
-        area_units_series = self.pds_scenario.get_area_units_units() 
+
+        area_units_series = self.pds_scenario.get_area_units_units()
         pds_base_year = pds_series.loc[self.base_year+1]
         area_units_base_year = area_units_series.loc[self.base_year+1]
-        result  = pds_base_year / area_units_base_year
-        return result
+        return pds_base_year / area_units_base_year
 
 
     def get_percent_adoption_start_year(self) -> np.float64:
@@ -124,19 +123,17 @@ class OceanSolution(Solution):
         pds_start_year = pds_series.loc[self.start_year]
         area_units_start_year = area_units_series.loc[self.start_year]
 
-        result = pds_start_year / area_units_start_year
-        return result
+        return pds_start_year / area_units_start_year
     
 
     def get_percent_adoption_end_year(self) -> np.float64:
         pds_series = self.pds_scenario.get_units_adopted()
         area_units_series = self.pds_scenario.get_area_units_units()
-        
+
         pds_start_year = pds_series.loc[self.end_year]
         area_units_start_year = area_units_series.loc[self.end_year]
 
-        result = pds_start_year / area_units_start_year
-        return result
+        return pds_start_year / area_units_start_year
 
 
 
@@ -184,11 +181,9 @@ class OceanSolution(Solution):
         ref_series = self.ref_scenario.get_operating_cost( self.end_year) * (1+self.disturbance_rate)
         ref_result = ref_series.cumsum().loc[self.end_year] - ref_series.cumsum().loc[self.start_year]
 
-        result = (ref_result - pds_result) / 1000 # in billions
-
         # result should match "Difference in Operating Cost (Reference - PDS)". [Operating Cost]!$C$125
 
-        return result
+        return (ref_result - pds_result) / 1000
 
     
     def get_lifetime_operating_savings(self) -> np.float64:
@@ -222,9 +217,7 @@ class OceanSolution(Solution):
         cumulative_sum = pds_series.cumsum()
 
         max_val_index = cumulative_sum.argmax()
-        max_val = cumulative_sum.iloc[max_val_index]
-
-        return max_val
+        return cumulative_sum.iloc[max_val_index]
 
 
     def get_payback_period_soln_only_npv(self, purchase_year) -> np.float64:
@@ -236,9 +229,7 @@ class OceanSolution(Solution):
         cumulative_sum = pds_series.cumsum()
 
         max_val_index = cumulative_sum.argmax()
-        max_val = cumulative_sum.iloc[max_val_index]
-
-        return max_val
+        return cumulative_sum.iloc[max_val_index]
 
 
     def get_payback_period_soln_to_conv(self, purchase_year) -> np.float64:
@@ -258,9 +249,7 @@ class OceanSolution(Solution):
         cumulative_sum = net_series.cumsum()
 
         max_val_index = cumulative_sum.argmax()
-        max_val = cumulative_sum.iloc[max_val_index]
-
-        return max_val
+        return cumulative_sum.iloc[max_val_index]
 
 
     def get_payback_period_soln_to_conv_npv(self, purchase_year) -> np.float64:
@@ -276,9 +265,7 @@ class OceanSolution(Solution):
         cumulative_sum = net_series.cumsum()
 
         max_val_index = cumulative_sum.argmax()
-        max_val = cumulative_sum.iloc[max_val_index]
-
-        return max_val
+        return cumulative_sum.iloc[max_val_index]
 
 
     def get_lifetime_cashflow_npv_all(self) -> np.float64:
@@ -392,7 +379,10 @@ class OceanSolution(Solution):
             annual_reduction_in_total_degraded_area = annual_reduction_in_total_degraded_area_ref - annual_reduction_in_total_degraded_area_pds
 
             annual_reduction_in_total_degraded_area *= self.emissions_reduced_per_unit_area
-            result = annual_reduction_in_total_degraded_area.loc[self.start_year:self.end_year]
+            return annual_reduction_in_total_degraded_area.loc[
+                self.start_year : self.end_year
+            ]
+
         else:
             # Direct Emissions Saved - CO2 (from Reduced Land Degradation)
             # [Unit Adoption Calculations]!BG307
@@ -403,9 +393,7 @@ class OceanSolution(Solution):
             direct_emissions_saved = total_undegraded_area_pds - total_undegraded_area_ref
 
             direct_emissions_saved *= self.emissions_reduced_per_unit_area
-            result = direct_emissions_saved.loc[self.start_year:self.end_year]
-        
-        return result
+            return direct_emissions_saved.loc[self.start_year:self.end_year]
 
 
     def get_total_emissions_reduction(self):
@@ -472,16 +460,14 @@ class OceanSolution(Solution):
                         self.delay_regrowth_of_degraded_land_by_one_year,
                         self.use_adoption_for_carbon_sequestration_calculation,
                         self.use_aggregate_CO2_equivalent_instead_of_individual_GHG)
-        
+
         if self.use_aggregate_CO2_equivalent_instead_of_individual_GHG:
             net_sequestration = (pds_sequestration - ref_sequestration)
         else:
             net_sequestration = (ref_sequestration - pds_sequestration)
             net_sequestration = net_sequestration.diff()
-        
-        result = net_sequestration.loc[self.end_year]
 
-        return result
+        return net_sequestration.loc[self.end_year]
 
 
     def get_change_in_ppm_equivalent_final_year(self) -> np.float64:
@@ -505,18 +491,17 @@ class OceanSolution(Solution):
                         self.delay_regrowth_of_degraded_land_by_one_year,
                         self.use_adoption_for_carbon_sequestration_calculation,
                         self.direct_emissions_are_annual)
-                        
+
         if self.direct_emissions_are_annual:
             net_sequestration = (pds_sequestration - ref_sequestration)
         else:
             net_sequestration = (ref_sequestration - pds_sequestration)
             net_sequestration = net_sequestration.diff()
-        
-        # net_sequestration should equal 'CO2-eq PPM Calculator' on tab [CO2 Calcs]!$B$224
-        
-        result = net_sequestration.loc[self.end_year] - net_sequestration.loc[self.end_year-1]
 
-        return result
+        return (
+            net_sequestration.loc[self.end_year]
+            - net_sequestration.loc[self.end_year - 1]
+        )
         
 
     def get_max_annual_co2_sequestered(self) -> np.float64:
@@ -572,12 +557,13 @@ class OceanSolution(Solution):
     def get_reduced_area_degradation(self) -> np.float64:
         total_undegraded_area_pds = self.pds_scenario.get_total_undegraded_area(self.growth_rate_of_ocean_degradation, self.disturbance_rate, self.delay_impact_of_protection_by_one_year)
         total_undegraded_area_ref = self.ref_scenario.get_total_undegraded_area(self.growth_rate_of_ocean_degradation, self.disturbance_rate, self.delay_impact_of_protection_by_one_year)
- 
+
         total_undegraded_area = total_undegraded_area_pds - total_undegraded_area_ref
 
-        result = total_undegraded_area.loc[self.end_year] - total_undegraded_area.loc[self.start_year - 1]
-
-        return result
+        return (
+            total_undegraded_area.loc[self.end_year]
+            - total_undegraded_area.loc[self.start_year - 1]
+        )
 
 
     def get_carbon_under_protection_final_year(self) -> np.float64:

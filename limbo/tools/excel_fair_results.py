@@ -62,32 +62,58 @@ animation_sectors = {
     'Micro-Grids': ['Electricity'],
     'Distributed Energy Storage': ['Electricity'],
     'Utility-Scale Energy Storage': ['Electricity'],
-    'Plant-Rich Diets': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
-    'Plant-Rich Diet': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
-    'Reduced Food Waste': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
-    'Macro Algal Farming': [ 'Food, Agriculture, Land Use', 'Ocean Sinks'],
-    'Avoided Land Conversion': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
-    'Avoided Land Use Conversion': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
+    'Plant-Rich Diets': ['Food, Agriculture, Land Use', 'Land Sinks'],
+    'Plant-Rich Diet': ['Food, Agriculture, Land Use', 'Land Sinks'],
+    'Reduced Food Waste': ['Food, Agriculture, Land Use', 'Land Sinks'],
+    'Macro Algal Farming': ['Food, Agriculture, Land Use', 'Ocean Sinks'],
+    'Avoided Land Conversion': ['Food, Agriculture, Land Use', 'Land Sinks'],
+    'Avoided Land Use Conversion': [
+        'Food, Agriculture, Land Use',
+        'Land Sinks',
+    ],
     'Forest Protection': ['Food, Agriculture, Land Use', 'Land Sinks'],
     "Indigenous Peoples' Forest Tenure": ['Food, Agriculture, Land Use'],
     'Sustainable Forestry': ['Food, Agriculture, Land Use', 'Land Sinks'],
     'Grassland Protection': ['Food, Agriculture, Land Use'],
     'Peatland Protection': ['Food, Agriculture, Land Use', 'Land Sinks'],
-    'Peatland Protection & Rewetting': ['Food, Agriculture, Land Use', 'Land Sinks'],
+    'Peatland Protection & Rewetting': [
+        'Food, Agriculture, Land Use',
+        'Land Sinks',
+    ],
     'Peatland Restoration': ['Food, Agriculture, Land Use', 'Land Sinks'],
-    'Coastal Wetland Protection': ['Food, Agriculture, Land Use', 'Ocean Sinks'],
-    'Coastal Wetland Protection': ['Food, Agriculture, Land Use', 'Ocean Sinks'],
-    'Coastal Wetland Restoration': ['Food, Agriculture, Land Use', 'Ocean Sinks'],
-    'Coastal Wetlands Restoration': ['Food, Agriculture, Land Use', 'Ocean Sinks'],
-    'Sustainable Intensification for Smallholders': ['Food, Agriculture, Land Use', 'Land Sinks'],
-    'Conservation Agriculture': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
-    'Regenerative Annual Cropping': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
-    'Improved Livestock Feeds': [ 'Food, Agriculture, Land Use'],
-    'Nutrient Management': [ 'Food, Agriculture, Land Use'],
-    'Farm Irrigation Efficiency': [ 'Food, Agriculture, Land Use'],
-    'Improved Rice Production': [ 'Food, Agriculture, Land Use'],
-    'System of Rice Intensification': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
-    'System of Rice Instensification': [ 'Food, Agriculture, Land Use', 'Land Sinks'],
+    'Coastal Wetland Protection': [
+        'Food, Agriculture, Land Use',
+        'Ocean Sinks',
+    ],
+    'Coastal Wetland Restoration': [
+        'Food, Agriculture, Land Use',
+        'Ocean Sinks',
+    ],
+    'Coastal Wetlands Restoration': [
+        'Food, Agriculture, Land Use',
+        'Ocean Sinks',
+    ],
+    'Sustainable Intensification for Smallholders': [
+        'Food, Agriculture, Land Use',
+        'Land Sinks',
+    ],
+    'Conservation Agriculture': ['Food, Agriculture, Land Use', 'Land Sinks'],
+    'Regenerative Annual Cropping': [
+        'Food, Agriculture, Land Use',
+        'Land Sinks',
+    ],
+    'Improved Livestock Feeds': ['Food, Agriculture, Land Use'],
+    'Nutrient Management': ['Food, Agriculture, Land Use'],
+    'Farm Irrigation Efficiency': ['Food, Agriculture, Land Use'],
+    'Improved Rice Production': ['Food, Agriculture, Land Use'],
+    'System of Rice Intensification': [
+        'Food, Agriculture, Land Use',
+        'Land Sinks',
+    ],
+    'System of Rice Instensification': [
+        'Food, Agriculture, Land Use',
+        'Land Sinks',
+    ],
     'TBD': ['Industry'],
     'Alternative Cement': ['Industry'],
     'Alternative Concrete': ['Industry'],
@@ -116,7 +142,7 @@ animation_sectors = {
     'Electric Trains': ['Transportation'],
     'Biogas for Cooking': ['Buildings'],
     'Improved Clean Cookstoves': ['Buildings'],
-    'N/A': [ 'Other'],
+    'N/A': ['Other'],
     'Indigenous Peoples Forest Tenure': ['Land Sinks'],
     'Temperate Forest Restoration': ['Land Sinks'],
     'Tropical Forest Restoration': ['Land Sinks'],
@@ -131,17 +157,18 @@ animation_sectors = {
     'Tree Plantations (on Degraded Land)': ['Land Sinks'],
     'Tree Plantations on Degraded Land': ['Land Sinks'],
     'Bamboo Production': ['Land Sinks'],
-    'Marine Protected Areas': [ 'Ocean Sinks'],
-    'Kelp Forest Restoration': [ 'Ocean Sinks'],
-    'Marine Permaculture': [ 'Ocean Sinks'],
-    'Ocean Farming': [ 'Ocean Sinks'],
-    'Biochar Production': [ 'Engineered Sinks'],
-    'Other coming attractions *': [ 'Engineered Sinks'],
+    'Marine Protected Areas': ['Ocean Sinks'],
+    'Kelp Forest Restoration': ['Ocean Sinks'],
+    'Marine Permaculture': ['Ocean Sinks'],
+    'Ocean Farming': ['Ocean Sinks'],
+    'Biochar Production': ['Engineered Sinks'],
+    'Other coming attractions *': ['Engineered Sinks'],
     'Health & Education': ['Health & Education'],
     'Health and Education': ['Health & Education'],
     'Educating Girls': ['Health & Education'],
     'Family Planning': ['Health & Education'],
 }
+
 
 colors = {
     'Electricity': '#FD6317',
@@ -165,7 +192,7 @@ def baseline(solutions, book):
 
 
 def process_scenario(filename, outdir, scenario, book=False):
-    sheet_name = 'Gtperyr_' + scenario
+    sheet_name = f'Gtperyr_{scenario}'
     if book:
         name_r = 3
         name_c = 3
@@ -198,7 +225,7 @@ def process_scenario(filename, outdir, scenario, book=False):
             continue
         mechanism = col.iloc[dispo_r] if not pd.isna(col.iloc[dispo_r]) else 'Avoided'
         solution = col.iloc[name_r].strip() if not pd.isna(col.iloc[name_r]) else prev_solution
-        if solution == 'Peatland Protection' or solution == 'Peatland Restoration':
+        if solution in ['Peatland Protection', 'Peatland Restoration']:
             continue
         if mechanism == 'Avoided':
             numeric.iloc[0] = 0.0
@@ -235,7 +262,8 @@ def process_scenario(filename, outdir, scenario, book=False):
 
     outfile = os.path.splitext(os.path.basename(filename))[0] + '_Temperature_' + scenario + '.csv'
     temperature.to_csv(os.path.join(outdir, outfile), float_format='%.3f')
-    outfile = os.path.splitext(os.path.basename(filename))[0] + '_Concentration_' + scenario + '.csv'
+    outfile = f'{os.path.splitext(os.path.basename(filename))[0]}_Concentration_{scenario}.csv'
+
     concentration.to_csv(os.path.join(outdir, outfile), float_format='%.3f')
 
     return solutions.dropna(axis='columns', how='all').fillna(0.0)
@@ -358,7 +386,7 @@ def process_ghgs(file2020, outdir, file2017=None, writer=None, ext='.mp4'):
             mp4 = base + '_' + scenario + ext
             sectors_T = produce_animation(solutions=solutions, filename=os.path.join(outdir, mp4),
                     writer=writer)
-            csvfname = base + '_' + scenario + '_sector_temperature.csv'
+            csvfname = f'{base}_{scenario}_sector_temperature.csv'
             sectors_T.to_csv(os.path.join(outdir, csvfname))
 
 

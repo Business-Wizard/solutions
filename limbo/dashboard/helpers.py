@@ -9,11 +9,16 @@ def get_py_solutions():
     data = []
     py_solutions = solution_loader.all_solutions_scenarios()
     for name in py_solutions:
-        solution_module = importlib.import_module("solution." + name)
+        solution_module = importlib.import_module(f'solution.{name}')
         for scenario in solution_module.scenarios.values():
-            row = {"solution": name, "scenario": scenario.name}
-            row["pds_adoption_basis"] = scenario.soln_pds_adoption_basis
-            row["ref_adoption_basis"] = scenario.soln_ref_adoption_basis or "Default"
+            row = {
+                'solution': name,
+                'scenario': scenario.name,
+                'pds_adoption_basis': scenario.soln_pds_adoption_basis,
+                'ref_adoption_basis': scenario.soln_ref_adoption_basis
+                or "Default",
+            }
+
             data.append(row)
     return pd.json_normalize(data)
 
@@ -24,7 +29,7 @@ def get_excel_python_count(all_solutions, py_solutions):
     python_2020_count = 0
 
     for name in py_solutions['solution'].unique():
-        solution_module = importlib.import_module("solution." + name)
+        solution_module = importlib.import_module(f'solution.{name}')
         obj = solution_module.Scenario()
         if obj.ac.ref_base_adoption is not None:
             python_2020_count += 1
@@ -83,7 +88,7 @@ def get_custom_pds_data_basis_counts():
     data = pd.Series(0, index=sources)
     all_solutions = solution_loader.all_solutions()
     for name in all_solutions:
-        solution_module = importlib.import_module("solution." + name)
+        solution_module = importlib.import_module(f'solution.{name}')
         obj = solution_module.Scenario()
         if hasattr(obj, 'pds_ca'):
             for val in obj.pds_ca.scenarios.values():

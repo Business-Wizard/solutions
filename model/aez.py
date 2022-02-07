@@ -111,8 +111,7 @@ class AEZ(DataHandler, object, metaclass=MetaclassCache):
                 total_perc_allocated = la_df.loc[self.solution_name]['Total % allocated']
                 if total_perc_allocated > 0:
                     df.at[tmr, col] = total_perc_allocated
-        else:
-            self.soln_land_alloc_df = df
+        self.soln_land_alloc_df = df
 
 
     def _get_applicable_zones(self):
